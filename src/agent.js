@@ -3,9 +3,9 @@ import _superagent from 'superagent';
 
 const superagent = superagentPromise(_superagent, global.Promise);
 
-const API_ROOT = 'http://localhost:8000';
+// const API_ROOT = 'http://localhost:8000';
 // const API_ROOT = 'http://192.168.1.101:8000';
-// const API_ROOT = 'http://api.colombus.vn';
+const API_ROOT = 'http://api.colombus.vn';
 
 const encode = encodeURIComponent;
 const responseBody = res => res.body;
