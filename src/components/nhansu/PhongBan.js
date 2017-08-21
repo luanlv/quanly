@@ -79,70 +79,35 @@ class Home extends React.Component {
     
   }
   
-  themMoi = () => {
-    let that = this;
-  
-    agent.NhanSu.themPhongBan(this.state.data)
-      .then(res => {
-        that.init()
-      })
-    
-    this.setState({
-      visible: false,
-    });
-  }
   
   render() {
     console.log(this.state.phongban)
     return (
       <div className="home-page" style={{padding: 10, marginTop: 10}}>
-        <Button type="primary" onClick={this.showModal}>Thêm mới</Button>
-  
-        <hr/>
         
-        <Table dataSource={this.state.phongban} columns={columns} />
-        
-        <Modal
-          title="Thêm phòng/ban mới"
-          visible={this.state.visible}
-          onOk={this.themMoi}
-          onCancel={this.hideModal}
-          okText="Thêm mới"
-          cancelText="Đóng"
-        >
-          <Input placeholder="Tên"
-                 onChange={(e) => {
-                   let value = e.target.value
-                   this.setState(prev => {
-                     return {
-                       ...prev,
-                       data: {
-                         ...prev.data,
-                         ten: value
-                       }
-                     }
-                   })}}
-          />
-          <Input placeholder="Mã"
-                 onChange={(e) => {
-                   let value = e.target.value
-                   this.setState(prev => {
-                     return {
-                       ...prev,
-                       data: {
-                         ...prev.data,
-                         ma: value
-                       }
-                     }
-                 })}}
-          />
-          
-          <Radio.Group value={this.state.data.mien} onChange={this.handleSizeChange}>
-            <Radio.Button value="bac">Miền bắc</Radio.Button>
-            <Radio.Button value="nam">Miền nam</Radio.Button>
-          </Radio.Group>
-        </Modal>
-        
+        <Table dataSource={this.state.phongban}>
+          <ColumnGroup title="Name">
+            <Column
+              title="Tên phòng/ban"
+              dataIndex="ten"
+              key="ten"
+            />
+            <Column
+              title="Mã phòng ban"
+              dataIndex="ma"
+              key="ma"
+            />
+            <Column
+              title="Miền"
+              key="mien"
+              render={(text, record) => (
+                <span>
+                  {(record.mien === 1) ? <span style={{color: 'blue'}}>Miền bắc</span> : <span style={{color: 'red'}}>Miền nam</span>}
+              </span>
+              )}
+            />
+          </ColumnGroup>
+        </Table>
       </div>
     );
   }

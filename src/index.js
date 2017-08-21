@@ -7,21 +7,6 @@ import { LocaleProvider  } from 'antd-mobile';
 import enUS from 'antd-mobile/lib/locale-provider/en_US';
 
 import App from './components/App';
-// import Home from './components/Home';
-
-import HomeLaiXe from './components/laixe/Home';
-import DoMenuLaiXe from './components/laixe/DoMenu';
-import PhuPhiMenuLaiXe from './components/laixe/PhuPhiMenu';
-import EditPhuPhiLaiXe from './components/laixe/EditPhuPhi';
-import LaiXeThemDO from './components/laixe/DO';
-import LaiXeListDO from './components/laixe/ListDO';
-import LaiXeEditDO from './components/laixe/EditDO';
-import LaiXePassword from './components/laixe/Password';
-import LaiXeDangDi from './components/laixe/DangDi';
-
-import LaiXeThemPhuPhi from './components/laixe/PhuPhi';
-import LaiXeListPhuPhi from './components/laixe/ListPhuPhi';
-import LaiXeEditPhuPhi from './components/laixe/EditPhuPhi';
 
 import ThemLaiXe from './components/it/LaiXe';
 import ThemXe from './components/it/Xe';
@@ -60,7 +45,7 @@ ReactDOM.render((
       <Router history={hashHistory}>
         <Route path="/" component={App}>
           <IndexRoute component={Home} />
-          <Route path="lenhdieuxe" component={HomeDieuHanh} />
+          <Route path="do/dieuxe" component={HomeDieuHanh} />
           <Route path="phongban" component={PhongBan} />
           <Route path="nhanvien" component={NhanVien} />
           

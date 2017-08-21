@@ -4,8 +4,8 @@ import _superagent from 'superagent';
 const superagent = superagentPromise(_superagent, global.Promise);
 
 // const API_ROOT = 'http://localhost:8000';
-// const API_ROOT = 'http://192.168.1.101:8000';
-const API_ROOT = 'http://api.colombus.vn';
+const API_ROOT = 'http://192.168.1.100:8000';
+// const API_ROOT = 'http://api.colombus.vn';
 
 const encode = encodeURIComponent;
 const responseBody = res => res.body;
@@ -31,8 +31,8 @@ const requests = {
 const Auth = {
   current: () =>
     requests.get('/user'),
-  login: (username, password, type) =>
-    requests.post(`/${type}/users/login`, { user: { username, password } }),
+  login: (username, password) =>
+    requests.post(`/users/login`, { user: { username, password } }),
   register: (username, email, password) =>
     requests.post('/users', { user: { username, email, password } }),
   save: user =>
@@ -137,6 +137,8 @@ const IT = {
 const DieuHanh = {
   listDOchuaxacnhan: () =>
     requests.get('/dieuhanh/do/chuaxacnhan'),
+  getDOs: (date) =>
+    requests.get('/dieuhanh/do/all/' + date),
   listDOchuaphancong: () =>
     requests.get('/dieuhanh/do/chuaphancong'),
   listDODaNhan: () =>
@@ -182,6 +184,8 @@ const DieuHanh = {
     requests.post('/dieuhanh/users/themlaixe', {data}),
   themXe: data =>
     requests.post('/dieuhanh/xe/them', {data}),
+  getDate: () =>
+    requests.get('/date'),
 }
 
 

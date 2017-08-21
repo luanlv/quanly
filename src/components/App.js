@@ -9,7 +9,8 @@ import { APP_LOAD, REDIRECT,
 import { Layout, Menu, Breadcrumb, Icon, LocaleProvider, Button, Spin } from 'antd';
 import {Link} from 'react-router'
 import enUS from 'antd/lib/locale-provider/en_US';
-import { StickyContainer, Sticky } from 'react-sticky';
+import moment from 'moment'
+import intersection from 'lodash/intersection'
 
 const { Header, Content, Footer, Sider } = Layout;
 const SubMenu = Menu.SubMenu;
@@ -61,23 +62,28 @@ class App extends React.Component {
     }
   }
 
-  componentWillMount() {
+  componentWillMount = async() => {
     const token = window.localStorage.getItem('jwt');
     if (token) {
       agent.setToken(token);
     }
-
     this.props.onLoad(token ? agent.Auth.current() : null, token);
+  
+    const date = await agent.DieuHanh.getDate();
+    // console.log(date)
+    this.setState({
+      date: date.date
+    })
   }
-
+  
   render() {
-
     if (this.props.appLoaded) {
       if (!this.props.currentUser) {
         return (<div id="login">
           <Login />
         </div>)
       } else {
+        const role = this.props.currentUser.role
         return (
           <LocaleProvider locale={enUS}>
             <Layout>
@@ -107,26 +113,19 @@ class App extends React.Component {
                     </Link>
                   </Menu.Item>
                   
-                  <SubMenu
+                  {(intersection(role, [101, 201, 102, 202]).length > 0) && <SubMenu
                     key="lenhdieuxe"
                     title={<span><Icon type="idcard" /><span className="nav-text">Lệnh điều xe</span></span>}
                   >
                     <Menu.Item key="lenhdieuxe1">
-                      <Link to="lenhdieuxe" >Tất cả</Link>
+                      <Link to={"do/dieuxe"} >{moment(this.state.date, 'YYYYMMDD').format('DD-MM-YYYY')}</Link>
                     </Menu.Item>
-                    <Menu.Item key="lenhdieuxe1">
-                      <Link to="dieuxe" >Lệnh mới</Link>
-                    </Menu.Item>
+                    
                     <Menu.Item key="lenhdieuxe2">
-                      <Link to="#" >Lệnh chưa phân công</Link>
+                      <Link to="lichsudieuxe" >Lịch sử</Link>
                     </Menu.Item>
-                    <Menu.Item key="lenhdieuxe3">
-                      <Link to="#" >Lệnh đang chạy</Link>
-                    </Menu.Item>
-                    <Menu.Item key="lenhdieuxe4">
-                      <Link to="#" >Lệnh hoàn thành</Link>
-                    </Menu.Item>
-                  </SubMenu>
+                    
+                  </SubMenu>}
   
                   <SubMenu
                     key="laixe"
@@ -199,26 +198,17 @@ class App extends React.Component {
                     </Menu.Item>
                  
                   </SubMenu>
-                  
-                  <Menu.Item key="Logout">
-                    <a href="/auth/logout">
-                  <span>
-                    <Icon type="tool" />
-                    <span className="nav-text">Đăng xuất</span>
-                  </span>
-                    </a>
-                  </Menu.Item>
                 </Menu>
               </Sider>
       
               <Layout>
                 <Header style={{ height: 47, background: 'white', padding: 0}} >
+                  <Button type="ghost"
+                          style={{float: 'right', margin: 10 }}
+                          onClick={this.props.onClickLogout}
+                  >Đăng xuất</Button>
                 </Header>
                 <Content style={{ margin: '0 5px' }}>
-                  {/*<Breadcrumb style={{ margin: '12px 0' }}>*/}
-                    {/*<Breadcrumb.Item>Admin</Breadcrumb.Item>*/}
-                    {/*<Breadcrumb.Item>{ this.state.name }</Breadcrumb.Item>*/}
-                  {/*</Breadcrumb>*/}
                   <div style={{background: '#fff', minHeight: 500 }}>
                     {this.props.children}
                   </div>

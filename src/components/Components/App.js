@@ -3,7 +3,7 @@ import { Layout, Menu, Breadcrumb, Icon, LocaleProvider, Button } from 'antd';
 import {Link} from 'react-router'
 import enUS from 'antd/lib/locale-provider/en_US';
 import { StickyContainer, Sticky } from 'react-sticky';
-
+import agent from '../../agent'
 const { Header, Content, Footer, Sider } = Layout;
 const SubMenu = Menu.SubMenu;
 
@@ -16,6 +16,15 @@ class App extends React.Component {
       mode: 'inline',
     };
   }
+  
+  componentWillMount = async () => {
+    const date = await agent.DieuHanh.getDate();
+    // console.log(date)
+    this.setState({
+      date: date.date
+    })
+  }
+  
   onCollapse = (collapsed) => {
     this.setState({
       collapsed,

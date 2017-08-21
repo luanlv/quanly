@@ -15,7 +15,7 @@ import agent from '../../agent';
 import { connect } from 'react-redux';
 import { List, InputItem } from 'antd-mobile';
 import { createForm } from 'rc-form'
-
+import intersection from 'lodash/intersection'
 
 import {
   HOME_PAGE_LOADED,
@@ -36,6 +36,7 @@ const mapStateToProps = state => ({
   ...state.home,
   appName: state.common.appName,
   token: state.common.token,
+  user: state.common.currentUser,
   xe: state.common.currentUser.xe
 });
 
@@ -53,12 +54,17 @@ class DOPage extends React.Component {
 
   constructor(props){
     super(props)
+    
+    let madoitruong = intersection(props.user.role, [102, 202]).length > 0 && props.user.ma
+    
     this.state = {
       data: {
+        doitruong:  madoitruong,
+        quaydau: this.props.quaydau || false,
         tienphatsinh: 0,
         tienthu: 0,
         trongtai: 1,
-        sokm: 0,
+        sokm: 50,
         sodiem: 1,
         xe: this.props.xe
       },
@@ -134,26 +140,32 @@ class DOPage extends React.Component {
 
   render() {
     let gThis = this
-  
     const diadiem = [];
     this.state.diemxuatphat.map((el,key) => {
       diadiem.push(<Option key={el.code}>{el.name + ' - ' + el.code + ' | ' + el.tinh.name}</Option>);
     })
-    
-  
-    
+    const role = this.props.user.role
+    // console.log('==')
     return (
-      <div className="home-page" style={{marginTop: 15 }}>
-        <div style={{padding: 10}}>
-          <h2 style={{textAlign: 'center', fontSize: 24}}>Lệnh điều động xe</h2>
+      <div className="home-page" style={{marginTop: 0 }}>
+        <div style={{padding: 5}}>
+          <h2 style={{textAlign: 'center', fontSize: 24}}>Lệnh điều xe {this.state.data.quaydau && "(quay đầu)"}</h2>
           {this.state.init && <div>
             <Row>
-              <b style={{fontSize: 16}}>Lái xe:</b>
-              <SelectLaiXe
-                option={this.state.laixe}
-                handleChange={this.changeLaiXe.bind(this)}
-              />
-            </Row>
+                <Col span={12}>
+                  <b style={{fontSize: 16}}>Lái xe:</b>
+                  <SelectLaiXe
+                    disabled={!(intersection(role, [102, 202]).length > 0)}
+                    option={this.state.laixe}
+                    handleChange={this.changeLaiXe.bind(this)}
+                  />
+                </Col>
+                <Col span={12}>
+                  <b style={{fontSize: 16}}>Xe:</b>
+                  <Input
+                  />
+                </Col>
+              </Row>
             
             
             <Row>
@@ -182,8 +194,6 @@ class DOPage extends React.Component {
             </Row>
             <Row style={{marginTop: 10}}>
               <b style={{fontSize: 16}}>Điểm xuất phát:</b>
-              
-  
               <Select
                 // mode="multiple"
                 showSearch
@@ -302,7 +312,7 @@ class DOPage extends React.Component {
             </Row>
             <Row style={{marginTop: 10}}>
 
-              <Col span={12}>
+              <Col span={24}>
                 <b style={{fontSize: 16}}>Trọng tải (tấn):</b>
                 <InputNumber style={{width: '100%'}} size="large"
                              value={this.state.data.trongtai}
@@ -363,35 +373,35 @@ class DOPage extends React.Component {
                              {/*}}*/}
                 {/*/>*/}
               {/*</Col>*/}
-              <Col span={12}>
-                <b style={{fontSize: 16}}> KM: </b>
-                <InputNumber style={{width: '100%'}} size="large" min={1} max={1000}
-                             value={this.state.data.sokm}
-                             onChange={(value) => {
-                               if(!isNaN(parseFloat(value))) {
-                                 this.setState(prev => {
-                                   return {
-                                     ...prev,
-                                     data: {
-                                       ...prev.data,
-                                       sokm: value
-                                     }
-                                   }
-                                 })
-                               } else {
-                                 this.setState(prev => {
-                                   return {
-                                     ...prev,
-                                     data: {
-                                       ...prev.data,
-                                       sokm: 1
-                                     }
-                                   }
-                                 })
-                               }
-                             }}
-                />
-              </Col>
+              {/*<Col span={12}>*/}
+                {/*<b style={{fontSize: 16}}> KM: </b>*/}
+                {/*<InputNumber style={{width: '100%'}} size="large" min={1} max={1000}*/}
+                             {/*value={this.state.data.sokm}*/}
+                             {/*onChange={(value) => {*/}
+                               {/*if(!isNaN(parseFloat(value))) {*/}
+                                 {/*this.setState(prev => {*/}
+                                   {/*return {*/}
+                                     {/*...prev,*/}
+                                     {/*data: {*/}
+                                       {/*...prev.data,*/}
+                                       {/*sokm: value*/}
+                                     {/*}*/}
+                                   {/*}*/}
+                                 {/*})*/}
+                               {/*} else {*/}
+                                 {/*this.setState(prev => {*/}
+                                   {/*return {*/}
+                                     {/*...prev,*/}
+                                     {/*data: {*/}
+                                       {/*...prev.data,*/}
+                                       {/*sokm: 1*/}
+                                     {/*}*/}
+                                   {/*}*/}
+                                 {/*})*/}
+                               {/*}*/}
+                             {/*}}*/}
+                {/*/>*/}
+              {/*</Col>*/}
             </Row>
   
             <Row style={{marginTop: 10}}>
@@ -468,7 +478,8 @@ class DOPage extends React.Component {
                           agent.DieuHanh.themDO(data)
                             .then(res => {
                               message.success("Thêm mới thành công")
-                              this.context.router.replace('/dieuhanh');
+                              // this.context.router.replace('/dieuhanh');
+                              this.props.success()
                             })
                             .catch(err => {
                               message.error("Thêm mới that bai")

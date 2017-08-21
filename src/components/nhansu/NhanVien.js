@@ -111,6 +111,7 @@ class Home extends React.Component {
   }
   
   render() {
+    const phongban = this.state.phongban
     const children = [];
     this.state.phongban.map((el, index) => {
       children.push(<Option key={el.ma}>{el.ten} - {el.ma}</Option>);
@@ -130,15 +131,23 @@ class Home extends React.Component {
             />
             <Column
               title="Mã nhân viên"
-              dataIndex="ma"
               key="ma"
+              render={(text, record) => (
+                <div style={{color: (record.ma >= 2000)?"red":"blue"}}>
+                  {record.ma}
+                </div>
+                )}
             />
             <Column
-              title="Mã phòng ban"
+              title="Phòng ban"
               key="phongban"
               render={(text, record) => (
                 <span>
-                {record.phongban.join(', ')}
+                {record.phongban.map((ma, index) => {
+                  return <div key={index} style={{color: (ma >= 200)?"red":"blue"}}>
+                    + {findPhongban(ma, phongban).ten} - {ma}
+                  </div>
+                })}
               </span>
               )}
             />
@@ -175,23 +184,7 @@ class Home extends React.Component {
                      }
                    })}}
           />
-  
-          <br/>
-  
-          <Input placeholder="Mã"
-                 onChange={(e) => {
-                   let value = e.target.value
-                   this.setState(prev => {
-                     return {
-                       ...prev,
-                       data: {
-                         ...prev.data,
-                         ma: value
-                       }
-                     }
-                 })}}
-          />
-  
+          
           <br/>
   
           <Radio.Group value={this.state.data.mien} onChange={this.handleSizeChange}>
@@ -212,21 +205,6 @@ class Home extends React.Component {
   
           <br/>
           
-          <Input placeholder="Mật khẩu"
-                 type="password"
-                 onChange={(e) => {
-                   let value = e.target.value
-                   this.setState(prev => {
-                     return {
-                       ...prev,
-                       data: {
-                         ...prev.data,
-                         password: value
-                       }
-                     }
-                   })}}
-          />
-          
         </Modal>
         
       </div>
@@ -235,3 +213,12 @@ class Home extends React.Component {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);
+
+function findPhongban(ma, list){
+  for(var i = 0; i< list.length; i++){
+    if(list[i].ma === ma){
+      return list[i]
+    }
+  }
+  return {}
+}

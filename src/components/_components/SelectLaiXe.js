@@ -1,12 +1,13 @@
 import React from 'react'
 import {Row, Col, Input, Button, message, Select, AutoComplete, InputNumber} from 'antd'
 import {slugify} from '../_function'
-const Option = Select.Option;
+const Option = Select.Option
 
 class CustomSelect extends React.Component {
   render () {
     return (
       <Select
+        disabled={this.props.disabled}
         showSearch
         style={{width: '100%'}}
         // value={this.props.value}
@@ -17,7 +18,7 @@ class CustomSelect extends React.Component {
         filterOption={(input, option) => slugify(option.props.children.toLowerCase()).indexOf(slugify(input.toLowerCase())) >= 0}
       >
         {this.props.option.map((el, index) => {
-          return <Option value={el._id} key={index}>{el.name}</Option>
+          return <Option value={'' + el.ma} key={index}>{el.ten}</Option>
         })}
       </Select>
     )
