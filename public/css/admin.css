@@ -1052,6 +1052,11 @@ span.CodeMirror-selectedtext {
   line-height: 16px;
   font-weight: bold; }
 
+.shadow {
+  -webkit-box-shadow: 4px 4px 5px 0px rgba(50, 50, 50, 0.75);
+  -moz-box-shadow: 4px 4px 5px 0px rgba(50, 50, 50, 0.75);
+  box-shadow: 4px 4px 5px 0px rgba(50, 50, 50, 0.75); }
+
 .ant-layout {
   min-height: 100vh; }
 

@@ -6,10 +6,11 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { APP_LOAD, REDIRECT,
   LOGOUT} from '../constants/actionTypes';
-import { Layout, Menu, Breadcrumb, Icon, LocaleProvider, Button, Spin } from 'antd';
+import { Layout, Menu, Breadcrumb, Icon, LocaleProvider, Button, Spin, DatePicker } from 'antd';
 import {Link} from 'react-router'
 import enUS from 'antd/lib/locale-provider/en_US';
 import moment from 'moment'
+
 import intersection from 'lodash/intersection'
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -113,7 +114,7 @@ class App extends React.Component {
                     </Link>
                   </Menu.Item>
                   
-                  {(intersection(role, [101, 201, 102, 202]).length > 0) && <SubMenu
+                  {(intersection(role, [302, 101, 201, 1002]).length > 0) && <SubMenu
                     key="lenhdieuxe"
                     title={<span><Icon type="idcard" /><span className="nav-text">Lệnh điều xe</span></span>}
                   >
@@ -122,22 +123,26 @@ class App extends React.Component {
                     </Menu.Item>
                     
                     <Menu.Item key="lenhdieuxe2">
+                      <Link to={"do/dieuxe"} >{moment(this.state.date, 'YYYYMMDD').add(1, 'days').format('DD-MM-YYYY')} +</Link>
+                    </Menu.Item>
+                    
+                    <Menu.Item key="lenhdieuxe3">
                       <Link to="lichsudieuxe" >Lịch sử</Link>
                     </Menu.Item>
                     
                   </SubMenu>}
   
-                  <SubMenu
-                    key="laixe"
-                    title={<span><Icon type="idcard" /><span className="nav-text">Lái xe</span></span>}
-                  >
-                    <Menu.Item key="laixe1">
-                      <Link to="#" >Thêm lái xe</Link>
-                    </Menu.Item>
-                    <Menu.Item key="laixe2">
-                      <Link to="#" >Danh sách lái xe</Link>
-                    </Menu.Item>
-                  </SubMenu>
+                  {/*<SubMenu*/}
+                    {/*key="laixe"*/}
+                    {/*title={<span><Icon type="idcard" /><span className="nav-text">Lái xe</span></span>}*/}
+                  {/*>*/}
+                    {/*<Menu.Item key="laixe1">*/}
+                      {/*<Link to="#" >Thêm lái xe</Link>*/}
+                    {/*</Menu.Item>*/}
+                    {/*<Menu.Item key="laixe2">*/}
+                      {/*<Link to="#" >Danh sách lái xe</Link>*/}
+                    {/*</Menu.Item>*/}
+                  {/*</SubMenu>*/}
   
   
                   <SubMenu

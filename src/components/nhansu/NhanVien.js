@@ -144,7 +144,7 @@ class Home extends React.Component {
               render={(text, record) => (
                 <span>
                 {record.phongban.map((ma, index) => {
-                  return <div key={index} style={{color: (ma >= 200)?"red":"blue"}}>
+                  return <div key={index} style={{color: (ma >= 300)?"orange":((ma >= 200)?"red":"blue")}}>
                     + {findPhongban(ma, phongban).ten} - {ma}
                   </div>
                 })}

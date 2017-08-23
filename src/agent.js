@@ -173,9 +173,9 @@ const DieuHanh = {
     requests.post(`/dieuhanh/autofill/new`, data),
   themDiaDiem: (data) =>
     requests.post(`/dieuhanh/autofill/newPlace`, data),
-
-  danhsachThauPhu: () =>
-    requests.get('/dieuhanh/users/danhsachthauphu'),
+  
+  danhSachThauPhu: () =>
+    requests.get('/danhsachthauphu'),
   themThauPhu: data =>
     requests.post('/dieuhanh/users/themthauphu', {data}),
   danhsachxe: () =>

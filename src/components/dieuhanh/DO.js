@@ -10,13 +10,13 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Row, Col, Input, Button, message, Select, AutoComplete, InputNumber, Spin, Switch} from 'antd'
+import {Row, Col, Input, Button, message, Select, AutoComplete, InputNumber, Spin, DatePicker} from 'antd'
 import agent from '../../agent';
 import { connect } from 'react-redux';
 import { List, InputItem } from 'antd-mobile';
 import { createForm } from 'rc-form'
 import intersection from 'lodash/intersection'
-
+import moment from 'moment'
 import {
   HOME_PAGE_LOADED,
   HOME_PAGE_UNLOADED,
@@ -79,32 +79,38 @@ class DOPage extends React.Component {
     }
   }
 
-  componentWillMount() {
+  componentWillMount = async () => {
     let that = this
-    agent.DieuHanh.danhsachlaixe()
-      .then(res => {
-        that.setState(prev => {return {
-          ...prev,
-          laixe: res
-        }})
-      })
-    agent.DieuHanh.autofill()
-      .then(res => {
-        that.setState(prev => {return {
-          ...prev,
-          khachhang: valueByField('khachhang', res),
-          // diemxuatphat: valueByField('diadiem', res),
-          diemtrahang: valueByField('diadiem', res),
-          nguoiyeucau: valueByField('nguoiyeucau', res),
-        }})
-        agent.DieuHanh.autofillPlace()
-          .then(res => {
-            that.setState(prev => {return {
-              ...prev,
-              init: true,
-              diemxuatphat:  res
-            }})
-          })
+    const danhsachlaixe = await agent.DieuHanh.danhsachlaixe()
+      // .then(res => {
+      //   that.setState(prev => {return {
+      //     ...prev,
+      //     laixe: res
+      //   }})
+      // })
+    const autofill = await agent.DieuHanh.autofill()
+    //   .then(res => {
+    //     that.setState(prev => {return {
+    //       ...prev,
+    //       khachhang: valueByField('khachhang', res),
+    //       // diemxuatphat: valueByField('diadiem', res),
+    //       diemtrahang: valueByField('diadiem', res),
+    //       nguoiyeucau: valueByField('nguoiyeucau', res),
+    //     }})
+    // })
+    const autofillPlace = await agent.DieuHanh.autofillPlace()
+      // .then(res => {
+      //   that.setState(prev => {return {
+      //     ...prev,
+      //     init: true,
+      //     diemxuatphat:  res
+      //   }})
+      // })
+    this.setState({
+      laixe: danhsachlaixe,
+      khachhang: valueByField('khachhang', autofill),
+      diemxuatphat: autofillPlace,
+      init: true
     })
   }
 
@@ -139,6 +145,11 @@ class DOPage extends React.Component {
 
 
   render() {
+    if(!this.state.init) return (
+      <div style={{textAlign: 'center', paddingTop: 50}}>
+        <Spin  size="large" tip="Đang tải..." />
+      </div>
+    );
     let gThis = this
     const diadiem = [];
     this.state.diemxuatphat.map((el,key) => {
@@ -152,19 +163,47 @@ class DOPage extends React.Component {
           <h2 style={{textAlign: 'center', fontSize: 24}}>Lệnh điều xe {this.state.data.quaydau && "(quay đầu)"}</h2>
           {this.state.init && <div>
             <Row>
-                <Col span={12}>
-                  <b style={{fontSize: 16}}>Lái xe:</b>
-                  <SelectLaiXe
-                    disabled={!(intersection(role, [102, 202]).length > 0)}
-                    option={this.state.laixe}
-                    handleChange={this.changeLaiXe.bind(this)}
-                  />
-                </Col>
-                <Col span={12}>
-                  <b style={{fontSize: 16}}>Xe:</b>
-                  <Input
-                  />
-                </Col>
+              <b style={{fontSize: 16}}>Ngày: </b>
+              <DatePicker format="DD-MM-YYYY"
+                          disabledDate={(current) => {
+                             return current && current.valueOf() <= moment(this.props.date, 'YYYYMMDD');
+                          }}
+                          onChange={(value) => {this.setState(prev => {
+                            return {
+                              ...prev,
+                              data: {
+                                ...prev.data,
+                                date: moment(value).format('YYYYMMDD')
+                              }
+                            }
+                          })}}
+                          defaultValue={moment(this.props.date, 'YYYYMMDD').add(1, 'days')}
+              />
+            </Row>
+            <Row>
+              <b style={{fontSize: 16}}>Thầu phụ: </b>
+              <Select defaultValue={this.props.thauphu + ''} style={{ width: '100%' }} >
+                {this.props.danhsachthauphu.map((el, index) => {
+                  console.log(this.props.danhsachthauphu)
+                  return <Option key={el.ma + index} value={'' + el.ma}>{el.ten}</Option>
+                })}
+                
+              </Select>
+            </Row>
+            <Row>
+                {/*<Col>*/}
+                  {/*<b style={{fontSize: 16}}>Lái xe:</b>*/}
+                  {/*<SelectLaiXe*/}
+                    {/*disabled={!(intersection(role, [102, 202]).length > 0)}*/}
+                    {/*option={this.state.laixe}*/}
+                    {/*handleChange={this.changeLaiXe.bind(this)}*/}
+                  {/*/>*/}
+                {/*</Col>*/}
+                {/*<Col span={12}>*/}
+                  {/*<b style={{fontSize: 16}}>Xe:</b>*/}
+                  {/*<Input*/}
+                  {/*/>*/}
+                {/*</Col>*/}
               </Row>
             
             
@@ -491,12 +530,6 @@ class DOPage extends React.Component {
               </Button>
             </Row>
           </div> }
-          
-          {!this.state.init && (
-            <div style={{textAlign: 'center', paddingTop: 50}}>
-              <Spin  size="large" tip="Đang tải..." />
-            </div>
-          )}
         </div>
       </div>
     )

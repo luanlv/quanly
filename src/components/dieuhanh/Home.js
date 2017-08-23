@@ -11,6 +11,7 @@ import intersection from 'lodash/intersection'
 import { Button, DatePicker, Table, Timeline, Icon, Row, Col, Input, Modal, Card, message, Select, Radio, Tabs} from 'antd';
 import DO from './DO'
 import moment from 'moment'
+var async = require('async')
 const TabPane = Tabs.TabPane;
 
 const Promise = global.Promise;
@@ -43,39 +44,55 @@ class Home extends React.Component {
         mien: 'bac'
       },
       phongban: [],
-      DOs: []
+      DOs: [],
+      loadingText: '...'
     }
     this.init()
   }
   
-  componentWillMount = async () => {
+  componentWillMount = () => {
     // const date = await agent.DieuHanh.getDate();
     // const DOs = await agent.DieuHanh.getDOs(date.date);
     // this.setState({
     //   date: date.date,
     //   DOs: DOs,
     //   init: true
-    // })
+    // })ole.log(result)
+    //   })
   }
   
   init = async () => {
-    const date = await agent.DieuHanh.getDate();
-    const DOs = await agent.DieuHanh.getDOs(date.date);
-    this.setState({
-      date: date.date,
-      DOs: DOs,
-      init: true
-    })
+    let that = this;
+    try {
+      const date = await agent.DieuHanh.getDate();
+      const DOs = await agent.DieuHanh.getDOs(date.date);
+      const danhsachthauphu = await agent.DieuHanh.danhSachThauPhu();
+      // console.log(date)
+      if (date && DOs) {
+        this.setState({
+          date: date.date,
+          DOs: DOs,
+          danhsachthauphu: danhsachthauphu,
+          init: true
+        })
+      }
+    }catch (e) {
+      that.setState({
+        loadingText: '' + e
+      })
+    }
+    
   }
 
   render() {
-    const role = this.props.user.role
+    const role = this.props.user.role;
     
     let lenhcho = []
     let chuanhan = []
     let danhan = []
     let hoanthanh = []
     let daduyet = []
+    
     this.state.DOs.map((el, index) => {
       if(el.laixe === -1){
         lenhcho.push(el)
@@ -89,16 +106,34 @@ class Home extends React.Component {
         daduyet.push(el)
       }
     })
+    
+    if(!this.state.init){
+      return (
+        <div>
+          {this.state.loadingText}
+        </div>
+      )
+    }
+    
     return (
       <div className="home-page" style={{marginTop: 10, padding: 10}}>
         <h2 style={{textAlign: 'center', color: 'red'}}>{moment(this.state.date, 'YYYYMMDD').format('DD-MM-YYYY')}</h2>
-        <Button type="primary" onClick={this.showModal1}>Thêm lệnh mới</Button>
-        <Button type="danger" onClick={this.showModal2}>Lệnh điều xe (quay đầu)</Button>
+        <span style={{marginRight: 5}}>
+          <Button type="primary" onClick={this.showModal1}>COLOMBUS</Button>
+        </span>
+        <span style={{marginRight: 5}}>
+          <Button type="danger" onClick={this.showModal2}>COLOMBUS (quay đầu)</Button>
+        </span>
+        <span style={{marginRight: 5}}>
+          <Button type="primary" onClick={this.showModal}>Thầu phụ</Button>
+        </span>
+        <span style={{marginRight: 5}}>
+          <Button type="danger" onClick={this.showModal2}>Thầu phụ (quay đầu)</Button>
+        </span>
         <hr
           style={{margin: 10}}
         />
         {/*// modal*/}
-  
         <Tabs
           defaultActiveKey="1"
           tabPosition={"left"}
@@ -107,7 +142,8 @@ class Home extends React.Component {
             {lenhcho.map((el, index) => {
               return (
                 <div key={index}
-                  style={{borderRadius: 5, border: '1px solid', marginBottom: 10, borderColor: el.quaydau ? "red": "#333", fontSize: 16, padding: 5, cursor: 'pointer'}}
+                  className="shadow"
+                  style={{borderRadius: 3, border: '1px solid', marginBottom: 10, borderColor: el.quaydau ? "orange": "#ddd", fontSize: 16, padding: 5, cursor: 'pointer'}}
                 >
                   Mã DO: <b>{el._id}</b>
                   <br/>
@@ -125,7 +161,7 @@ class Home extends React.Component {
             {chuanhan.map((el, index) => {
               return (
                 <div key={index}
-                     style={{borderRadius: 5, border: '1px solid', marginBottom: 10, borderColor: el.quaydau ? "red": "#333", fontSize: 16, padding: 5, cursor: 'pointer'}}
+                     style={{borderRadius: 5, border: '1px solid', marginBottom: 10, borderColor: el.quaydau ? "orange": "#ddd", fontSize: 16, padding: 5, cursor: 'pointer'}}
                 >
                   Mã DO: <b>{el._id}</b>
                   <br/>
@@ -163,6 +199,9 @@ class Home extends React.Component {
                 this.hideModal()
                 this.init()
               }}
+              thauphu={this.state.thauphu}
+              danhsachthauphu={this.state.danhsachthauphu}
+              date={this.state.date}
           />}
         </Modal>
       </div>
@@ -173,13 +212,15 @@ class Home extends React.Component {
     this.setState({
       visible: true,
       quaydau: false,
+      thauphu: 101,
     });
   }
   
   showModal2 = () => {
     this.setState({
       visible: true,
-      quaydau: true
+      quaydau: true,
+      thauphu: 101,
     });
   }
   

@@ -102,7 +102,11 @@ class Home extends React.Component {
               key="mien"
               render={(text, record) => (
                 <span>
-                  {(record.mien === 1) ? <span style={{color: 'blue'}}>Miền bắc</span> : <span style={{color: 'red'}}>Miền nam</span>}
+                  <span
+                    style={{color: (record.mien === 3)?"orange":((record.mien === 2)?"red":"blue")}}
+                  >
+                    {(record.mien === 3)?"Toàn quốc":((record.mien === 2)?"Miền nam":"Miền bắc")}
+                  </span>
               </span>
               )}
             />
