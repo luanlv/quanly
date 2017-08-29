@@ -103,7 +103,7 @@ class App extends React.Component {
                 <Menu theme="dark"
                       mode={this.state.mode}
                       selectedKeys={[this.props.name]}
-                      defaultOpenKeys={[]}
+                      defaultOpenKeys={['lenhdieuxe']}
                 >
                   <Menu.Item key="Dashboard">
                     <Link to="/">
@@ -119,16 +119,12 @@ class App extends React.Component {
                     title={<span><Icon type="idcard" /><span className="nav-text">Lệnh điều xe</span></span>}
                   >
                     <Menu.Item key="lenhdieuxe1">
-                      <Link to={"do/dieuxe"} >{moment(this.state.date, 'YYYYMMDD').format('DD-MM-YYYY')}</Link>
+                      <Link to={"do/dieuxe"} >Lệnh điều xe</Link>
                     </Menu.Item>
                     
-                    <Menu.Item key="lenhdieuxe2">
-                      <Link to={"do/dieuxe"} >{moment(this.state.date, 'YYYYMMDD').add(1, 'days').format('DD-MM-YYYY')} +</Link>
-                    </Menu.Item>
-                    
-                    <Menu.Item key="lenhdieuxe3">
-                      <Link to="lichsudieuxe" >Lịch sử</Link>
-                    </Menu.Item>
+                    {/*<Menu.Item key="lenhdieuxe3">*/}
+                      {/*<Link to="lichsudieuxe" >Lịch sử</Link>*/}
+                    {/*</Menu.Item>*/}
                     
                   </SubMenu>}
   

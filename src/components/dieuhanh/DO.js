@@ -28,6 +28,10 @@ import CompleteInputPlace  from '../_components/CompleteInputPlace'
 import CustomSelect  from '../_components/CustomSelect'
 import SelectLaiXe  from '../_components/SelectLaiXe'
 import {slugify} from '../_function'
+import ReactSelect from 'react-select';
+
+// Be sure to include styles at some point, probably during your bootstrapping
+import 'react-select/dist/react-select.css';
 
 const Option = Select.Option;
 const Promise = global.Promise;
@@ -50,15 +54,73 @@ const mapDispatchToProps = dispatch => ({
 });
 
 
+const searchStyle = {
+  width: '100%'
+}
+
+var getOptions = function(input, callback) {
+  setTimeout(function() {
+    callback(null, {
+      options: [
+        { code: 'one', label: 'One' },
+        { code: 'two', label: 'Two' }
+      ],
+      // CAREFUL! Only set this to true when there are no more options,
+      // or more specific queries will not be sent to the server.
+      complete: true
+    });
+  }, 500);
+};
+
+
+// const getOptions = (input, callback) => {
+  // agent.DieuHanh.place(input)
+  //   .then((response) => {
+  //     callback(null, {
+  //       options: [
+  //       { value: 'one', label: 'One' },
+  //       { value: 'two', label: 'Two' }
+  //       ],
+  //       // CAREFUL! Only set this to true when there are no more options,
+  //       // or more specific queries will not be sent to the server.
+  //       complete: true
+  //     });
+  //   })
+  // setTimeout(function() {
+  //   callback(null, {
+  //     options: [
+  //       { value: 'one', label: input },
+  //       { value: 'two', label: input + input }
+  //     ],
+  //     // CAREFUL! Only set this to true when there are no more options,
+  //     // or more specific queries will not be sent to the server.
+  //     complete: true
+  //   });
+  // }, 500);
+// }
+
 class DOPage extends React.Component {
 
   constructor(props){
     super(props)
     
-    let madoitruong = intersection(props.user.role, [102, 202]).length > 0 && props.user.ma
+    let madoitruong = intersection(props.user.role, [101]).length > 0 ? null : props.user.ma
+    
+    // console.log(props.user.ma)
+    let obj = {}
+    props.danhsachxe.forEach(el => {
+      obj[el.laixe] = el
+    })
+  
+    const data = Object.assign({}, props.data)
+    if(props.tinhtrang === 0 && props.data.thauphu !== 101){
+      data.laixe = 999;
+      // props.danhsachlaixe.push({})
+      // console.log(props.danhsachlaixe)
+    }
     
     this.state = {
-      data: {
+      data: props.tinhtrang >= 0 ? data : {
         doitruong:  madoitruong,
         quaydau: this.props.quaydau || false,
         tienphatsinh: 0,
@@ -66,7 +128,8 @@ class DOPage extends React.Component {
         trongtai: 1,
         sokm: 50,
         sodiem: 1,
-        xe: this.props.xe
+        xe: '',
+        laixe: -1
       },
       init: false,
       khachhang: [],
@@ -75,40 +138,23 @@ class DOPage extends React.Component {
       nguoiyeucau: [],
       phatsinh: false,
       doixe: false,
-      laixe: []
+      laixe: props.danhsachlaixe || [],
+      xe: props.danhsachxe || [],
+      danhsachxe: props.danhsachxe.map(el => {return el.bks}),
+      xeOBJ: obj,
+      select: []
     }
   }
 
   componentWillMount = async () => {
     let that = this
-    const danhsachlaixe = await agent.DieuHanh.danhsachlaixe()
-      // .then(res => {
-      //   that.setState(prev => {return {
-      //     ...prev,
-      //     laixe: res
-      //   }})
-      // })
+ 
     const autofill = await agent.DieuHanh.autofill()
-    //   .then(res => {
-    //     that.setState(prev => {return {
-    //       ...prev,
-    //       khachhang: valueByField('khachhang', res),
-    //       // diemxuatphat: valueByField('diadiem', res),
-    //       diemtrahang: valueByField('diadiem', res),
-    //       nguoiyeucau: valueByField('nguoiyeucau', res),
-    //     }})
-    // })
+
     const autofillPlace = await agent.DieuHanh.autofillPlace()
-      // .then(res => {
-      //   that.setState(prev => {return {
-      //     ...prev,
-      //     init: true,
-      //     diemxuatphat:  res
-      //   }})
-      // })
     this.setState({
-      laixe: danhsachlaixe,
       khachhang: valueByField('khachhang', autofill),
+      nguoiyeucau: valueByField('nguoiyeucau', autofill),
       diemxuatphat: autofillPlace,
       init: true
     })
@@ -131,7 +177,6 @@ class DOPage extends React.Component {
   }
 
   changeLaiXe(value) {
-    console.log(value)
     this.setState(prev => {
       return {
         ...prev,
@@ -141,6 +186,18 @@ class DOPage extends React.Component {
         }
       }
     })
+    
+    if(this.state.xeOBJ[parseInt(value)]){
+      this.setState(prev => {
+        return {
+          ...prev,
+          data: {
+            ...prev.data,
+            xe: this.state.xeOBJ[parseInt(value)].bks
+          }
+        }
+      })
+    }
   }
 
 
@@ -153,20 +210,20 @@ class DOPage extends React.Component {
     let gThis = this
     const diadiem = [];
     this.state.diemxuatphat.map((el,key) => {
-      diadiem.push(<Option key={el.code}>{el.name + ' - ' + el.code + ' | ' + el.tinh.name}</Option>);
+      diadiem.push(<Option key={el.code}>{el.name + ' - ' + el.code}</Option>);
+      // diadiem.push(<Option key={el.code}>{el.name + ' - ' + el.code + ' | ' + el.tinh.name}</Option>);
     })
     const role = this.props.user.role
-    // console.log('==')
     return (
       <div className="home-page" style={{marginTop: 0 }}>
         <div style={{padding: 5}}>
           <h2 style={{textAlign: 'center', fontSize: 24}}>Lệnh điều xe {this.state.data.quaydau && "(quay đầu)"}</h2>
           {this.state.init && <div>
-            <Row>
+            {this.props.tinhtrang >= 0 && <Row>
               <b style={{fontSize: 16}}>Ngày: </b>
               <DatePicker format="DD-MM-YYYY"
                           disabledDate={(current) => {
-                             return current && current.valueOf() <= moment(this.props.date, 'YYYYMMDD');
+                             return current && current.valueOf() < moment(Date.now()).add(-1, 'days');
                           }}
                           onChange={(value) => {this.setState(prev => {
                             return {
@@ -177,44 +234,141 @@ class DOPage extends React.Component {
                               }
                             }
                           })}}
-                          defaultValue={moment(this.props.date, 'YYYYMMDD').add(1, 'days')}
+                          defaultValue={moment(Date.now())}
               />
+            </Row>}
+            {this.props.tinhtrang < 0 && intersection(role, [101]).length > 0 && <Row>
+              <b style={{fontSize: 16}}>Đội trưởng:</b>
+              <Select style={{ width: '100%' }}
+                      onChange={(val) => {
+                        this.setState(prev => {
+                          return {
+                            ...prev,
+                            data: {
+                              ...prev.data,
+                              doitruong: parseInt(val)
+                            }
+                          }
+                        })
+                      }}
+              >
+                <Option value={'' + 1012}>Trần Văn Mỹ</Option>
+                <Option value={'' + 1013}>Trần Ngọc Chỉnh</Option>
+              </Select>
             </Row>
-            <Row>
+              }
+              
+            {this.props.tinhtrang < 0 && this.props.thauphu && <Row>
               <b style={{fontSize: 16}}>Thầu phụ: </b>
-              <Select defaultValue={this.props.thauphu + ''} style={{ width: '100%' }} >
-                {this.props.danhsachthauphu.map((el, index) => {
-                  console.log(this.props.danhsachthauphu)
+              <Select style={{ width: '100%' }}
+                      onChange={(val) => {
+                        this.setState(prev => {
+                          return {
+                            ...prev,
+                            data: {
+                              ...prev.data,
+                              thauphu: parseInt(val)
+                            }
+                          }
+                        })
+                      }}
+              >
+                {this.props.danhsachthauphu.filter((el) => {return el.ma !== 101}).map((el, index) => {
                   return <Option key={el.ma + index} value={'' + el.ma}>{el.ten}</Option>
                 })}
                 
               </Select>
+            </Row>}
+            
+            { this.props.tinhtrang < 0 && (this.state.data.thauphu === 999) && <Row>
+              <b style={{fontSize: 16}}>Giá chuyến: </b>
+              <InputNumber
+                defaultValue={this.state.data.giachuyen}
+                min={0}
+                formatter={value => `${value.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`}
+                parser={value => value.replace(/(,*)/g, '')}
+                style={{width: '100%'}}
+                onChange={(value) => {
+                  if(parseInt(value).isNaN){
+                    value = 0;
+                  }
+                  this.setState(prev => {
+                    return {
+                      ...prev,
+                      data: {
+                        ...prev.data,
+                        giachuyen: value
+                      }
+                    }
+                  })
+                }}
+              />
             </Row>
-            <Row>
-                {/*<Col>*/}
-                  {/*<b style={{fontSize: 16}}>Lái xe:</b>*/}
-                  {/*<SelectLaiXe*/}
-                    {/*disabled={!(intersection(role, [102, 202]).length > 0)}*/}
-                    {/*option={this.state.laixe}*/}
-                    {/*handleChange={this.changeLaiXe.bind(this)}*/}
-                  {/*/>*/}
-                {/*</Col>*/}
-                {/*<Col span={12}>*/}
-                  {/*<b style={{fontSize: 16}}>Xe:</b>*/}
-                  {/*<Input*/}
-                  {/*/>*/}
-                {/*</Col>*/}
-              </Row>
+            }
             
-            
-            <Row>
+            {this.props.tinhtrang >=0 && this.state.data.thauphu === 101 &&<Row>
+                <Col>
+                  <b style={{fontSize: 16}}>Lái xe:</b>
+                  <SelectLaiXe
+                    disabled={!(intersection(role, [1002]).length > 0)}
+                    option={this.state.laixe}
+                    handleChange={this.changeLaiXe.bind(this)}
+                  />
+                </Col>
+                <Col span={24}>
+                  <b style={{fontSize: 16}}>Xe:</b>
+                  <AutoComplete
+                    style={{width: '100%'}}
+                    dataSource={this.state.danhsachxe}
+                    value={this.state.data.xe}
+                    onChange={(v) => {
+                      this.setState(prev => {
+                        return {
+                          ...prev,
+                          data: {
+                            ...prev.data,
+                            xe: v
+                          }
+                        }
+                      })
+                    }}
+                    placeholder="xxX-xxxxx"
+                    // filterOption={(inputValue, option) => {return true}}
+                  />
+                </Col>
+            </Row>}
+  
+  
+            {this.props.tinhtrang === 0 && this.state.data.thauphu !== 101 &&<Row>
+              <Col>
+                <b style={{fontSize: 16}}>BKS:</b>
+                <Input
+                  onChange={(e) => {
+                    let value = e.target.value;
+                    this.setState(prev => {
+                      return {
+                        ...prev,
+                        data: {
+                          ...prev.data,
+                          xe: value
+                        }
+                      }
+                    })
+                  }}
+                />
+              </Col>
+         
+            </Row>}
+  
+  
+            {this.props.tinhtrang < 0 && <Row>
                 <b style={{fontSize: 16}}>Khách hàng:</b>
                 <CompleteInput
                   option={this.state.khachhang}
                   onChange={this.changeKhachhang.bind(this)}
                 />
-            </Row>
-            <Row>
+            </Row>}
+            {this.props.tinhtrang < 0 && <Row>
                 <b style={{fontSize: 16}}>Người yêu cầu:</b>
                 <CompleteInput
                   option={this.state.nguoiyeucau}
@@ -230,13 +384,13 @@ class DOPage extends React.Component {
                     })
                   }}
                 />
-            </Row>
-            <Row style={{marginTop: 10}}>
+            </Row>}
+            {this.props.tinhtrang < 0 && <Row style={{marginTop: 10}}>
               <b style={{fontSize: 16}}>Điểm xuất phát:</b>
               <Select
                 // mode="multiple"
                 showSearch
-                style={{ width: '100%' }}
+                style={searchStyle}
                 placeholder="Chọn địa điểm"
                 filterOption={(input, option) => {
                   return slugify(option.props.children.toLowerCase()).indexOf(slugify(input.toLowerCase())) >= 0}
@@ -256,57 +410,59 @@ class DOPage extends React.Component {
               >
                 {diadiem}
               </Select>
-               
-            </Row>
-            <Row style={{marginTop: 10}}>
-              <b style={{fontSize: 16}}>Điểm trả hàng: </b>
-              <div style={{float: 'right'}}>
-                <Button type="primary"
-                  onClick={() => {
-                    let that = this;
-                    var promptData = prompt("Danh sách code địa điểm", '');
+              
+            </Row>}
   
-                    if (promptData != null) {
-                     let codeArray = promptData.split(' ');
-                     let place = []
-                     let notFound = []
-                     codeArray.forEach(code => {
-                       if(!checkCode(code, that.state.diemxuatphat)){
-                         notFound.push(code)
-                       } else {
-                         place.push(code)
-                       }
-                     })
-                      
-                      if(notFound.length > 0 ){
-                       alert(`Địa điểm ${notFound} không tồn tại!`);
-                      } else {
-                        this.setState(prev => {
-                          return {
-                            ...prev,
-                            data: {
-                              ...prev.data,
-                              iddiemtrahang: codeArray
-                            }
-                          }
-                        })
-                      }
-                    }
-                  }}
-                >Nhập theo danh sách</Button>
-                <Button type="primary"
-                        onClick={() => {
-                          let that = this;
-                          agent.DieuHanh.autofillPlace()
-                            .then(res => {
-                              that.setState(prev => {return {
-                                ...prev,
-                                diemxuatphat:  res
-                              }})
-                            })
-                        }}
-                >Cập nhập địa điểm</Button>
-              </div>
+  
+            {this.props.tinhtrang < 0 && <Row style={{marginTop: 10}}>
+              <b style={{fontSize: 16}}>Điểm trả hàng: </b>
+              {/*<div style={{float: 'right'}}>*/}
+                {/*<Button type="primary"*/}
+                  {/*onClick={() => {*/}
+                    {/*let that = this;*/}
+                    {/*var promptData = prompt("Danh sách code địa điểm", '');*/}
+              
+                    {/*if (promptData != null) {*/}
+                     {/*let codeArray = promptData.split(' ');*/}
+                     {/*let place = []*/}
+                     {/*let notFound = []*/}
+                     {/*codeArray.forEach(code => {*/}
+                       {/*if(!checkCode(code, that.state.diemxuatphat)){*/}
+                         {/*notFound.push(code)*/}
+                       {/*} else {*/}
+                         {/*place.push(code)*/}
+                       {/*}*/}
+                     {/*})*/}
+                      {/**/}
+                      {/*if(notFound.length > 0 ){*/}
+                       {/*alert(`Địa điểm ${notFound} không tồn tại!`);*/}
+                      {/*} else {*/}
+                        {/*this.setState(prev => {*/}
+                          {/*return {*/}
+                            {/*...prev,*/}
+                            {/*data: {*/}
+                              {/*...prev.data,*/}
+                              {/*iddiemtrahang: codeArray*/}
+                            {/*}*/}
+                          {/*}*/}
+                        {/*})*/}
+                      {/*}*/}
+                    {/*}*/}
+                  {/*}}*/}
+                {/*>Nhập theo danh sách</Button>*/}
+                {/*<Button type="primary"*/}
+                        {/*onClick={() => {*/}
+                          {/*let that = this;*/}
+                          {/*agent.DieuHanh.autofillPlace()*/}
+                            {/*.then(res => {*/}
+                              {/*that.setState(prev => {return {*/}
+                                {/*...prev,*/}
+                                {/*diemxuatphat:  res*/}
+                              {/*}})*/}
+                            {/*})*/}
+                        {/*}}*/}
+                {/*>Cập nhập địa điểm</Button>*/}
+              {/*</div>*/}
        
               {/*<CompleteInputPlace*/}
                 {/*value={this.state.data.diemtrahang}*/}
@@ -327,13 +483,13 @@ class DOPage extends React.Component {
               
               <Select
                 mode="multiple"
-                style={{ width: '100%' }}
+                style={searchStyle}
                 value={this.state.data.iddiemtrahang}
                 placeholder="Chọn địa điểm"
                 filterOption={(input, option) => slugify(option.props.children).indexOf(slugify(input.toLowerCase())) >= 0}
                 // defaultValue={['a10', 'c12']}
                 onChange={(value) => {
-                  console.log(value)
+                  // console.log(value)
                   this.setState(prev => {
                     return {
                       ...prev,
@@ -348,8 +504,26 @@ class DOPage extends React.Component {
                 {diadiem}
               </Select>
               
-            </Row>
-            <Row style={{marginTop: 10}}>
+              {/*<ReactSelect.Async*/}
+                {/*multi={true}*/}
+                {/*valueKey="code"*/}
+                {/*// valueRenderer={option => {return option.name}}*/}
+                {/*name="form-field-name"*/}
+                {/*value={this.state.select}*/}
+                {/*loadOptions={getOptions}*/}
+                {/*onChange={(e) => {*/}
+                  {/*let value = this.state.select*/}
+                  {/*value.push(e[0].code)*/}
+                  {/*console.log(value)*/}
+                  {/*this.setState({select: value})*/}
+                {/*}}*/}
+              {/*/>*/}
+              
+            </Row>}
+  
+  
+  
+            {this.props.tinhtrang < 0 && <Row style={{marginTop: 10}}>
 
               <Col span={24}>
                 <b style={{fontSize: 16}}>Trọng tải (tấn):</b>
@@ -441,10 +615,7 @@ class DOPage extends React.Component {
                              {/*}}*/}
                 {/*/>*/}
               {/*</Col>*/}
-            </Row>
-  
-            <Row style={{marginTop: 10}}>
-            </Row>
+            </Row>}
             
             {/*<Row style={{marginTop: 10}}>*/}
             
@@ -499,8 +670,9 @@ class DOPage extends React.Component {
                 {/*</Col>*/}
               {/*</div>*/}
             {/*</Row>*/}
-            <Row style={{}}>
-              <Button type="primary"
+            
+            <Row style={{marginTop: 20}}>
+              {this.props.tinhtrang < 0 && <Button type="primary"
                       style={{fontSize: 16}}
                       onClick={() => {
                         if(check(gThis.state.data)) {
@@ -519,6 +691,7 @@ class DOPage extends React.Component {
                               message.success("Thêm mới thành công")
                               // this.context.router.replace('/dieuhanh');
                               this.props.success()
+                              
                             })
                             .catch(err => {
                               message.error("Thêm mới that bai")
@@ -527,7 +700,28 @@ class DOPage extends React.Component {
                       }}
               >
                 Tạo mới
-              </Button>
+              </Button>}
+  
+              {this.props.tinhtrang === 0 && <Button type="primary"
+                                                   style={{fontSize: 16}}
+                                                   onClick={() => {
+                                                     if(checkLaiXe(gThis.state.data)) {
+                                                       agent.DieuHanh.chonlaixe(gThis.state.data)
+                                                         .then(res => {
+                                                           message.success("Thêm mới thành công")
+                                                           // this.context.router.replace('/dieuhanh');
+                                                           this.props.success()
+      
+                                                         })
+                                                         .catch(err => {
+                                                           message.error("Thêm mới that bai")
+                                                         })
+                                                     }
+                                                   }}
+              >
+                Chọn lái xe & xe
+              </Button>}
+              
             </Row>
           </div> }
         </div>
@@ -625,5 +819,20 @@ function check(data){
     message.error("Số KM đi được không được để trống")
     return false
   }
+  return true
+}
+
+function checkLaiXe(data){
+
+  if(!data.laixe){
+    message.error("Lái xe không được để trống")
+    return false
+  }
+  
+  if(!data.xe){
+    message.error("Xe không được để trống")
+    return false
+  }
+  
   return true
 }

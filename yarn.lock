@@ -6163,6 +6163,13 @@ react-error-overlay@^1.0.5:
     settle-promise "1.0.0"
     source-map "0.5.6"
 
+react-input-autosize@^1.1.3:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/react-input-autosize/-/react-input-autosize-1.1.4.tgz#cbc45072d4084ddc57806db8e3b34e644b8366ac"
+  dependencies:
+    create-react-class "^15.5.2"
+    prop-types "^15.5.8"
+
 react-lazy-load@^3.0.10:
   version "3.0.12"
   resolved "https://registry.yarnpkg.com/react-lazy-load/-/react-lazy-load-3.0.12.tgz#2b841dfc3227e8119d033189d2c960ce384d0cb9"
@@ -6251,6 +6258,15 @@ react-router@^3.0.4:
     loose-envify "^1.2.0"
     prop-types "^15.5.6"
     warning "^3.0.0"
+
+react-select@^1.0.0-rc.5:
+  version "1.0.0-rc.5"
+  resolved "https://registry.yarnpkg.com/react-select/-/react-select-1.0.0-rc.5.tgz#9d316f252b1adc372ddb5cdf1f119c6b7cfdb5d6"
+  dependencies:
+    classnames "^2.2.4"
+    create-react-class "^15.5.2"
+    prop-types "^15.5.8"
+    react-input-autosize "^1.1.3"
 
 react-slick@~0.14.2:
   version "0.14.11"

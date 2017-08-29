@@ -15,10 +15,14 @@ class CustomSelect extends React.Component {
         placeholder="Chọn Lái Xe"
         onChange={this.props.handleChange}
         onSelect={this.props.selectOption}
-        filterOption={(input, option) => slugify(option.props.children.toLowerCase()).indexOf(slugify(input.toLowerCase())) >= 0}
+        filterOption={(input, option) => {
+          console.log(option.props.children.toLowerCase())
+          console.log(slugify(input.toLowerCase()))
+          return slugify(option.props.children.toLowerCase()).indexOf(slugify(input.toLowerCase())) >= 0
+        }}
       >
         {this.props.option.map((el, index) => {
-          return <Option value={'' + el.ma} key={index}>{el.ten}</Option>
+          return <Option value={'' + el.ma} key={index}>{el.ten + ' - ' + el.ma}</Option>
         })}
       </Select>
     )

@@ -3,8 +3,8 @@ import _superagent from 'superagent';
 
 const superagent = superagentPromise(_superagent, global.Promise);
 
-// const API_ROOT = 'http://localhost:8000';
-const API_ROOT = 'http://192.168.1.100:8000';
+const API_ROOT = 'http://localhost:8000';
+// const API_ROOT = 'http://192.168.1.100:8000';
 // const API_ROOT = 'http://api.colombus.vn';
 
 const encode = encodeURIComponent;
@@ -137,16 +137,16 @@ const IT = {
 const DieuHanh = {
   listDOchuaxacnhan: () =>
     requests.get('/dieuhanh/do/chuaxacnhan'),
-  getDOs: (date) =>
-    requests.get('/dieuhanh/do/all/' + date),
+  getDOs: () =>
+    requests.get('/dieuhanh/do/all'),
   listDOchuaphancong: () =>
     requests.get('/dieuhanh/do/chuaphancong'),
   listDODaNhan: () =>
     requests.get('/dieuhanh/do/danhan'),
   listDOChuaNhan: () =>
     requests.get('/dieuhanh/do/chuanhan'),
-  duyet: (id, action) =>
-    requests.post('/dieuhanh/do/duyet', {id: id, action: action}),
+  // duyet: (id, action) =>
+  //   requests.post('/dieuhanh/do/duyet', {id: id, action: action}),
   duyetphuphi: (id, action) =>
     requests.post('/dieuhanh/phuphi/duyet', {id: id, action: action}),
   DObyId: (id) =>
@@ -155,10 +155,24 @@ const DieuHanh = {
     requests.get(`/dieuhanh/autofill/all`),
   autofillPlace: () =>
     requests.get(`/dieuhanh/autofill/allPlace`),
+  place: (input) =>
+    requests.get(`/dieuhanh/autofill/place/${input}`),
   capnhapDO: data =>
     requests.post('/dieuhanh/do/capnhap', {data}),
   chonlaixe: data =>
     requests.post('/dieuhanh/do/chonlaixe', {data}),
+  nhanLenhThay: data =>
+    requests.post('/dieuhanh/do/nhanlenhthay', {data}),
+  huyLenhThay: data =>
+    requests.post('/dieuhanh/do/huylenhthay', {data}),
+  huyChuyen: data =>
+    requests.post('/dieuhanh/do/huychuyen', {data}),
+  huyChuyen2: data =>
+    requests.post('/dieuhanh/do/huychuyen2', {data}),
+  duyet: data =>
+    requests.post('/dieuhanh/do/duyet', {data}),
+  daGiaoHang: data =>
+    requests.post('/dieuhanh/do/dagiaohang', {data}),
   listPhuPhi: () =>
     requests.get(`/dieuhanh/phuphi/chuaxacnhan`),
   PhuPhibyId: (id) =>
@@ -167,6 +181,8 @@ const DieuHanh = {
     requests.post('/dieuhanh/phuphi/capnhap', {data}),
   danhsachlaixe: () =>
     requests.get('/dieuhanh/users/danhsachlaixe'),
+  danhsachxe: () =>
+    requests.get('/danhsachxe'),
   themDO: data =>
     requests.post('/dieuhanh/do/them', {data}),
   themAutoFill: (data) =>
@@ -178,8 +194,6 @@ const DieuHanh = {
     requests.get('/danhsachthauphu'),
   themThauPhu: data =>
     requests.post('/dieuhanh/users/themthauphu', {data}),
-  danhsachxe: () =>
-    requests.get('/dieuhanh/xe/danhsachxe'),
   themLaiXe: data =>
     requests.post('/dieuhanh/users/themlaixe', {data}),
   themXe: data =>
