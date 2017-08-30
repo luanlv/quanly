@@ -58,6 +58,8 @@ const searchStyle = {
   width: '100%'
 }
 
+
+
 var getOptions = function(input, callback) {
   setTimeout(function() {
     callback(null, {
@@ -72,32 +74,21 @@ var getOptions = function(input, callback) {
   }, 500);
 };
 
-
-// const getOptions = (input, callback) => {
-  // agent.DieuHanh.place(input)
-  //   .then((response) => {
-  //     callback(null, {
-  //       options: [
-  //       { value: 'one', label: 'One' },
-  //       { value: 'two', label: 'Two' }
-  //       ],
-  //       // CAREFUL! Only set this to true when there are no more options,
-  //       // or more specific queries will not be sent to the server.
-  //       complete: true
-  //     });
-  //   })
-  // setTimeout(function() {
-  //   callback(null, {
-  //     options: [
-  //       { value: 'one', label: input },
-  //       { value: 'two', label: input + input }
-  //     ],
-  //     // CAREFUL! Only set this to true when there are no more options,
-  //     // or more specific queries will not be sent to the server.
-  //     complete: true
-  //   });
-  // }, 500);
-// }
+const khachhang = [
+  {code: 'KH01', value: 'VIN'},
+  {code: 'KH02', value: 'LENSON'},
+  {code: 'KH03', value: 'KHÁCH LẺ'},
+]
+const nguoiyeucau = [
+  {code: 'YC01', value: 'Phùng Hoài Nam'},
+  {code: 'YC02', value: 'Ngô Văn Hưng'},
+  {code: 'YC03', value: 'Ngô Văn Hưng'},
+  {code: 'YC04', value: 'Nguyễn Văn Mạnh'},
+  {code: 'YC05', value: 'Trần Văn Mỹ'},
+  {code: 'YC06', value: 'Trần Ngọc Chỉnh'},
+  {code: 'YC07', value: 'Trần Ngọc Duyệt'},
+  {code: 'YC08', value: 'Đinh Thị Hưởng'},
+]
 
 class DOPage extends React.Component {
 
@@ -153,8 +144,8 @@ class DOPage extends React.Component {
 
     const autofillPlace = await agent.DieuHanh.autofillPlace()
     this.setState({
-      khachhang: valueByField('khachhang', autofill),
-      nguoiyeucau: valueByField('nguoiyeucau', autofill),
+      khachhang: khachhang,
+      nguoiyeucau: nguoiyeucau,
       diemxuatphat: autofillPlace,
       init: true
     })
